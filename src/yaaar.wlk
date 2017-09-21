@@ -1,4 +1,3 @@
-
 class Barco{
 	var tripulantes = new List()
 	var mision
@@ -71,8 +70,12 @@ class Barco{
 		return self.tripulantesPasadosDeGrogXD().max({tripulante => tripulante.dinero()})
 	}
 	
-	method tiposDistintosItemsTripulantesPasadosDeGrogXD(){//5B
-		a
+	method itemsTripulantesPasadosDeGrogXD(){
+		return self.tripulantesPasadosDeGrogXD().forEach({tripulante => tripulante.items()})
+	}
+	
+	method tiposDistintosItemsTripulantesPasadosDeGrogXD(){
+		return (self.itemsTripulantesPasadosDeGrogXD()).flatten().asSet()
 	}
 	
 	method lugaresLibres(){
@@ -105,8 +108,12 @@ class Barco{
 		ciudad.agregarHabitantes(1)
 	}
 	
+	method tripulantesInvitadosPor(){
+		return tripulantes.forEach({tripulante => tripulante.invitadoPor()})
+	}
+	
 	method quienInvitoMas(){
-		//6
+		return (self.tripulantesInvitadosPor().sortedBy({tripulante => tripulante.count()})).first()
 	}
 	
 }
@@ -179,7 +186,7 @@ class Pirata{
 	}
 	
 	method seAnimaASaquear(victima){
-		victima.puedeSerSaqueadoPor(self)	
+		return victima.puedeSerSaqueadoPor(self)	
 	}
 	
 	method puedeSerParteDe(barco){
@@ -197,9 +204,28 @@ class Pirata{
 		}
 		dinero -= 1
 	}
+}
+
+class EspiaDeLaCorona inherits Pirata{
+	constructor(nombreEspia, dineroEspia, ebriedadEspia, itemsEspia, espiaInvitadoPor) = super(nombreEspia, dineroEspia, ebriedadEspia, itemsEspia, espiaInvitadoPor){
+		nombre = nombreEspia
+		self.dinero(dineroEspia)
+		self.ebriedad(ebriedadEspia)
+		items = itemsEspia
+		invitadoPor = espiaInvitadoPor
+	}
 	
-	method esEspiaDeLaCorona(){
-		return (!self.pasadoDeGrogXD()) && self.seAnimaASaquear(victima) //PTO 4B
+	override method pasadoDeGrogXD(){
+		return false
+	}
+	
+	override method seAnimaASaquear(victima){
+		super(victima)
+		return self.tienePermisoDeLaCorona()
+	}
+	
+	method tienePermisoDeLaCorona(){
+		return items.contains("permiso de la corona")
 	}
 }
 
@@ -207,7 +233,6 @@ class Mision{
 	method puedeSerRealizadaPor(barco){
 		return barco.tieneSuficienteTripulacion()
 	}
-	
 }
 
 class BusquedaDelTesoro inherits Mision{
